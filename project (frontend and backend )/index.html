@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MindPulse AI - Student Stress & Dynamic ML Analytics</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+</head>
+<body>
+
+  <!-- App Header -->
+  <header>
+    <div class="header-container">
+      <a href="#" class="brand-logo">
+        <div class="logo-icon">
+          <i class="fa-solid fa-brain"></i>
+        </div>
+        <div class="brand-text">
+          <h1>MindPulse AI</h1>
+          <p>Student Stress & Dynamic ML Analytics</p>
+        </div>
+      </a>
+
+      <!-- Navigation Tabs -->
+      <nav class="nav-tabs">
+        <button class="nav-tab active" data-tab="datamgmt">
+          <i class="fa-solid fa-cloud-arrow-up"></i> Data & ML Studio
+        </button>
+        <button class="nav-tab" data-tab="predictor">
+          <i class="fa-solid fa-sliders"></i> Live Predictor
+        </button>
+        <button class="nav-tab" data-tab="benchmarks">
+          <i class="fa-solid fa-chart-column"></i> ML Benchmarks
+        </button>
+        <button class="nav-tab" data-tab="optimizer">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> Optimizer
+        </button>
+        <button class="nav-tab" data-tab="records">
+          <i class="fa-solid fa-user-graduate"></i> Dataset Explorer
+        </button>
+      </nav>
+
+      <div class="header-actions">
+        <button class="btn-danger" onclick="deleteDataset()">
+          <i class="fa-solid fa-trash-can"></i> Delete Data
+        </button>
+        <button class="btn-outline" onclick="exportReport()">
+          <i class="fa-solid fa-file-arrow-down"></i> Export Report
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main>
+
+    <!-- Alert Banner Container -->
+    <div id="alertContainer"></div>
+
+    <!-- Top KPI Summary Bar -->
+    <div class="summary-grid">
+      <div class="glass-panel stat-card rf">
+        <div class="stat-info">
+          <h4>Best ML Accuracy</h4>
+          <div class="stat-value" id="statBestModel">99.55%</div>
+          <div class="stat-sub">Random Forest Model</div>
+        </div>
+        <div class="stat-icon">
+          <i class="fa-solid fa-robot"></i>
+        </div>
+      </div>
+
+      <div class="glass-panel stat-card samples">
+        <div class="stat-info">
+          <h4>Dataset Records</h4>
+          <div class="stat-value" id="statSamples">1,100</div>
+          <div class="stat-sub">Analyzed CSV Samples</div>
+        </div>
+        <div class="stat-icon">
+          <i class="fa-solid fa-users"></i>
+        </div>
+      </div>
+
+      <div class="glass-panel stat-card high-stress">
+        <div class="stat-info">
+          <h4>High Stress Rate</h4>
+          <div class="stat-value" id="statHighRate">51.8%</div>
+          <div class="stat-sub">Requires Lifestyle Intervention</div>
+        </div>
+        <div class="stat-icon">
+          <i class="fa-solid fa-heart-pulse"></i>
+        </div>
+      </div>
+
+      <div class="glass-panel stat-card top-factor">
+        <div class="stat-info">
+          <h4>Top Predictor Factor</h4>
+          <div class="stat-value" id="statTopFactor" style="font-size:1.1rem; line-height:1.2; margin-top:4px;">Study Hours (42.8%)</div>
+          <div class="stat-sub">Calculated Feature Importance</div>
+        </div>
+        <div class="stat-icon">
+          <i class="fa-solid fa-book-open"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 0: DATA MANAGEMENT & ML STUDIO -->
+    <div id="datamgmt" class="tab-content active">
+      <div class="section-header">
+        <div class="section-title">
+          <h2><i class="fa-solid fa-cloud-arrow-up" style="color:var(--accent-cyan);"></i> Data Upload & ML Algorithm Studio</h2>
+          <p>Delete existing data, upload a new custom CSV dataset, and trigger real-time Machine Learning re-analysis.</p>
+        </div>
+      </div>
+
+      <div class="upload-grid">
+        <!-- Drag & Drop Zone -->
+        <div class="glass-panel dropzone-card" id="csvDropzone">
+          <div class="dropzone-icon">
+            <i class="fa-solid fa-file-csv"></i>
+          </div>
+          <div class="dropzone-title">Upload New CSV Dataset</div>
+          <div class="dropzone-subtitle">Drag and drop your dataset CSV here, or click to browse files</div>
+          
+          <button class="btn-primary" style="margin: 0 auto;">
+            <i class="fa-solid fa-folder-open"></i> Browse CSV File
+          </button>
+          
+          <input type="file" id="csvFileInput" accept=".csv" style="display: none;">
+        </div>
+
+        <!-- Data Action Controls -->
+        <div class="glass-panel data-config-card">
+          <div>
+            <h3 style="font-size:1.15rem; color:var(--text-main); margin-bottom:8px;">Data Management Controls</h3>
+            <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1.5rem;">Manage active dataset memory and run machine learning algorithms on new CSV inputs.</p>
+
+            <div style="margin-bottom:1.25rem;">
+              <button class="btn-danger" style="width:100%; justify-content:center;" onclick="deleteDataset()">
+                <i class="fa-solid fa-trash-can"></i> Delete Active Dataset & Reset ML Memory
+              </button>
+            </div>
+
+            <div style="margin-bottom:1rem;">
+              <button class="btn-outline" style="width:100%; justify-content:center;" onclick="reloadDefaultDataset()">
+                <i class="fa-solid fa-rotate-left"></i> Reload Sample Student Dataset
+              </button>
+            </div>
+          </div>
+
+          <div style="background:rgba(15, 23, 42, 0.6); padding:1rem; border-radius:var(--radius-md); border:1px solid var(--border-color); font-size:0.8rem; color:var(--text-muted);">
+            <i class="fa-solid fa-circle-info" style="color:var(--accent-cyan);"></i>
+            <strong>ML Auto-Train Engine:</strong> Supports Student Lifestyle, Mental Health, Academic, or Energy CSVs. Automatically trains Random Forest, Support Vector Machines (SVM), and Naive Bayes models.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 1: LIVE STRESS PREDICTOR -->
+    <div id="predictor" class="tab-content">
+      <div class="section-header">
+        <div class="section-title">
+          <h2><i class="fa-solid fa-sliders" style="color:var(--accent-cyan);"></i> AI Stress Predictor & Lifestyle Simulator</h2>
+          <p>Adjust daily study, sleep, academic and psychological parameters to simulate ML stress prediction in real-time.</p>
+        </div>
+      </div>
+
+      <div class="predictor-grid">
+        <!-- Input Form -->
+        <div class="glass-panel form-container">
+          <div class="form-group-title">
+            <i class="fa-solid fa-clock"></i> Daily Time Allocation (Hours)
+          </div>
+
+          <div class="sliders-grid">
+            <div class="slider-card">
+              <div class="slider-header">
+                <label><i class="fa-solid fa-book-open" style="color:var(--accent-cyan);"></i> Study Hours / Day</label>
+                <span class="slider-value" id="study_hours_val">8.5</span>
+              </div>
+              <input type="range" id="study_hours" min="1" max="14" step="0.5" value="8.5">
+            </div>
+
+            <div class="slider-card">
+              <div class="slider-header">
+                <label><i class="fa-solid fa-bed" style="color:var(--accent-purple);"></i> Sleep Hours / Day</label>
+                <span class="slider-value" id="sleep_hours_val">6.5</span>
+              </div>
+              <input type="range" id="sleep_hours" min="3" max="11" step="0.5" value="6.5">
+            </div>
+
+            <div class="slider-card">
+              <div class="slider-header">
+                <label><i class="fa-solid fa-graduation-cap" style="color:var(--accent-blue);"></i> Current GPA Score</label>
+                <span class="slider-value" id="gpa_score_val">3.50</span>
+              </div>
+              <input type="range" id="gpa_score" min="1.0" max="4.0" step="0.05" value="3.50">
+            </div>
+
+            <div class="slider-card">
+              <div class="slider-header">
+                <label><i class="fa-solid fa-person-running" style="color:#10b981;"></i> Physical Activity</label>
+                <span class="slider-value" id="activity_hours_val">2.0</span>
+              </div>
+              <input type="range" id="activity_hours" min="0" max="6" step="0.5" value="2.0">
+            </div>
+
+            <div class="slider-card">
+              <div class="slider-header">
+                <label><i class="fa-solid fa-comments" style="color:var(--accent-pink);"></i> Social Hours / Day</label>
+                <span class="slider-value" id="social_hours_val">3.0</span>
+              </div>
+              <input type="range" id="social_hours" min="0" max="8" step="0.5" value="3.0">
+            </div>
+          </div>
+
+          <div class="form-group-title">
+            <i class="fa-solid fa-head-side-virus"></i> Psychological & Symptom Scale (1 - 10)
+          </div>
+
+          <div class="sliders-grid">
+            <div class="slider-card">
+              <div class="slider-header">
+                <label>Anxiety Level</label>
+                <span class="slider-value" id="anxiety_val_val">5</span>
+              </div>
+              <input type="range" id="anxiety_val" min="1" max="10" step="1" value="5">
+            </div>
+
+            <div class="slider-card">
+              <div class="slider-header">
+                <label>Depression Index</label>
+                <span class="slider-value" id="depression_val_val">4</span>
+              </div>
+              <input type="range" id="depression_val" min="1" max="10" step="1" value="4">
+            </div>
+
+            <div class="slider-card">
+              <div class="slider-header">
+                <label>Self Esteem Score</label>
+                <span class="slider-value" id="esteem_val_val">7</span>
+              </div>
+              <input type="range" id="esteem_val" min="1" max="10" step="1" value="7">
+            </div>
+          </div>
+        </div>
+
+        <!-- Output Gauge & Recommendations Panel -->
+        <div class="glass-panel output-container">
+          <h3 style="font-size:1.1rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em;">Predicted Stress Classification</h3>
+          
+          <div class="gauge-wrapper">
+            <div class="stress-meter-bg"></div>
+            <div class="needle" id="gaugeNeedle"></div>
+            <div class="needle-cap"></div>
+          </div>
+
+          <div id="stressBadge" class="stress-badge mod">
+            <i class="fa-solid fa-circle-info"></i> Moderate Stress
+          </div>
+
+          <div class="confidence-score">
+            Model Confidence: <span id="confScore">98.4%</span> | Stress Index: <span id="stressScoreIndex" style="color:var(--accent-cyan);">48</span>/100
+          </div>
+
+          <div class="risk-breakdown">
+            <h4><i class="fa-solid fa-user-shield" style="color:var(--accent-cyan);"></i> AI Actionable Coping Advice</h4>
+            <div class="recommendations-list" id="recList">
+              <!-- Dynamically Populated -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: ML MODEL BENCHMARKS -->
+    <div id="benchmarks" class="tab-content">
+      <div class="section-header">
+        <div class="section-title">
+          <h2><i class="fa-solid fa-chart-column" style="color:var(--accent-cyan);"></i> Machine Learning Model Performance Benchmarks</h2>
+          <p>Evaluating Random Forest vs Support Vector Machine (SVM) vs Naive Bayes on active dataset.</p>
+        </div>
+      </div>
+
+      <div class="analytics-grid">
+        <!-- Model Accuracy Comparison Chart -->
+        <div class="glass-panel chart-card">
+          <div class="chart-header">
+            <h3><i class="fa-solid fa-trophy" style="color:var(--accent-cyan);"></i> Classifier Accuracy Comparison (%)</h3>
+          </div>
+          <div class="chart-container">
+            <canvas id="accuracyChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Feature Importance Chart -->
+        <div class="glass-panel chart-card">
+          <div class="chart-header">
+            <h3><i class="fa-solid fa-list-ol" style="color:var(--accent-purple);"></i> Top Feature Importance (Random Forest)</h3>
+          </div>
+          <div class="chart-container">
+            <canvas id="featureChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="analytics-grid">
+        <!-- Confusion Matrix Visualization -->
+        <div class="glass-panel chart-card" style="height:auto;">
+          <div class="chart-header">
+            <h3><i class="fa-solid fa-table-cells" style="color:var(--accent-blue);"></i> Random Forest Confusion Matrix</h3>
+          </div>
+          <p style="font-size:0.8rem; color:var(--text-muted);">Confusion matrix showing model precision and recall performance.</p>
+          <div class="matrix-container">
+            <div class="matrix-cell perfect">
+              <div class="cell-value" id="matrixHighVal">114</div>
+              <div class="cell-label">High Stress (Class 0)</div>
+            </div>
+            <div class="matrix-cell">
+              <div class="cell-value">0</div>
+              <div class="cell-label">False Predictions</div>
+            </div>
+            <div class="matrix-cell">
+              <div class="cell-value">0</div>
+              <div class="cell-label">False Predictions</div>
+            </div>
+            <div class="matrix-cell">
+              <div class="cell-value">0</div>
+              <div class="cell-label">False Predictions</div>
+            </div>
+            <div class="matrix-cell perfect">
+              <div class="cell-value" id="matrixLowVal">36</div>
+              <div class="cell-label">Low Stress (Class 1)</div>
+            </div>
+            <div class="matrix-cell">
+              <div class="cell-value">0</div>
+              <div class="cell-label">False Predictions</div>
+            </div>
+            <div class="matrix-cell">
+              <div class="cell-value">0</div>
+              <div class="cell-label">False Predictions</div>
+            </div>
+            <div class="matrix-cell">
+              <div class="cell-value">0</div>
+              <div class="cell-label">False Predictions</div>
+            </div>
+            <div class="matrix-cell perfect">
+              <div class="cell-value" id="matrixModVal">70</div>
+              <div class="cell-label">Moderate (Class 2)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stress Distribution Chart -->
+        <div class="glass-panel chart-card">
+          <div class="chart-header">
+            <h3><div class="fa-solid fa-chart-pie" style="color:#10b981;"></div> Dataset Label Distribution</h3>
+          </div>
+          <div class="chart-container">
+            <canvas id="distributionChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: LIFESTYLE OPTIMIZER -->
+    <div id="optimizer" class="tab-content">
+      <div class="section-header">
+        <div class="section-title">
+          <h2><i class="fa-solid fa-wand-magic-sparkles" style="color:var(--accent-cyan);"></i> Smart Student Lifestyle Optimizer</h2>
+          <p>Simulate how small adjustments in daily habits reduce predicted stress level and improve academic performance.</p>
+        </div>
+      </div>
+
+      <div class="optimizer-grid">
+        <div class="glass-panel before-after-card">
+          <h3 style="font-size:1.1rem; color:var(--accent-cyan); margin-bottom:1rem;">Interactive Habit Tweak Simulator</h3>
+
+          <div class="slider-card" style="margin-bottom:1rem;">
+            <div class="slider-header">
+              <label><i class="fa-solid fa-bed"></i> Target Sleep Increase (Hours)</label>
+              <span class="slider-value" id="opt_sleep_val">7.5</span>
+            </div>
+            <input type="range" id="opt_sleep" min="4" max="10" step="0.5" value="7.5">
+          </div>
+
+          <div class="slider-card" style="margin-bottom:1rem;">
+            <div class="slider-header">
+              <label><i class="fa-solid fa-person-running"></i> Daily Workout / Physical Activity</label>
+              <span class="slider-value" id="opt_workout_val">2.5</span>
+            </div>
+            <input type="range" id="opt_workout" min="0" max="5" step="0.5" value="2.5">
+          </div>
+        </div>
+
+        <div class="glass-panel before-after-card" style="display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;">
+          <h4 style="font-size:1rem; color:var(--text-muted); text-transform:uppercase;">Predicted Stress Reduction</h4>
+          <div id="optReductionResult" style="font-size:3.5rem; font-weight:800; font-family:'Outfit', sans-serif; color:#10b981; margin:1rem 0;">
+            -38%
+          </div>
+          <p style="color:var(--text-muted); max-width:380px; font-size:0.875rem;">
+            Increasing sleep to 7.5 hrs and daily physical activity to 2.5 hrs significantly lowers mental fatigue & anxiety index.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: STUDENT DATASET EXPLORER -->
+    <div id="records" class="tab-content">
+      <div class="section-header">
+        <div class="section-title">
+          <h2><i class="fa-solid fa-user-graduate" style="color:var(--accent-cyan);"></i> Student Dataset & Record Explorer</h2>
+          <p>Browse, filter, and inspect individual student lifestyle attributes and ML stress labels.</p>
+        </div>
+      </div>
+
+      <div class="glass-panel table-card">
+        <div class="table-toolbar">
+          <input type="text" id="searchInput" class="search-input" placeholder="Search by Student ID or Stress..." onkeyup="filterStudents()">
+          
+          <div class="filter-pills">
+            <button class="pill-btn active" data-filter="all" onclick="filterPill(this, 'all')">All Students</button>
+            <button class="pill-btn" data-filter="High" onclick="filterPill(this, 'High')">High Stress</button>
+            <button class="pill-btn" data-filter="Moderate" onclick="filterPill(this, 'Moderate')">Moderate Stress</button>
+            <button class="pill-btn" data-filter="Low" onclick="filterPill(this, 'Low')">Low Stress</button>
+          </div>
+        </div>
+
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Study Hours</th>
+              <th>Sleep Hours</th>
+              <th>GPA</th>
+              <th>Activity</th>
+              <th>Social</th>
+              <th>Label / Target</th>
+            </tr>
+          </thead>
+          <tbody id="studentTableBody">
+            <!-- Dynamically Rendered -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Modal for Student Dossier -->
+  <div class="modal-overlay" id="studentModal">
+    <div class="glass-panel modal-card">
+      <button class="modal-close" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
+      <div id="modalBody">
+        <!-- Dynamically Populated -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    MindPulse AI Dynamic ML Analytics Studio &copy; 2026. Real-time Random Forest, SVM & Naive Bayes Retraining.
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
